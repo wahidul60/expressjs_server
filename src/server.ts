@@ -52,7 +52,7 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 //User crud
-app.post('/user', async (req: Request, res: Response) => {
+app.post('/users', async (req: Request, res: Response) => {
   const { name, email } = req.body
   try {
     const result = await pool.query(
@@ -76,15 +76,74 @@ app.get('/users/:id', async (req: Request, res: Response) => {
     console.log(req.params.id)
     res.status(201).json({
       success: true,
-      message : "successful"
+      message: "successful"
     })
-  } catch (err:any) {
+  } catch (err: any) {
     res.status(500).json({
       success: false,
+      message: err.message
+    })
+  }
+
+})
+
+app.put('/update/:id', async (req: Request, res: Response) => {
+  const {name, email} = req.body
+  try {
+    const result = await pool.query(`UPDATE users SET name = $1, email=$2 WHERE id=$3 RETURNING*`, [name, email, req.params.id]);
+
+    if(result.rows.length === 0){
+      res.status(201).json({
+        success: false,
+        message: "data not found"
+      })
+    }else{
+        res.status(201).json({
+        success: true,
+        message: "updated successfully",
+        data : result.rows[0]
+      })
+    }
+
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
+  }
+
+})
+
+app.delete("/delete/:id", async (req:Request, res:Response)=> {
+  try{
+    const result = await pool.query(`DELETE FROM users WHERE id = $1 RETURNING *`, [req.params.id]);
+    if(result.rows.length === 0){
+      res.status(404).json({
+        successful : false,
+        message : "data not found"
+      })
+    }else{
+      res.status(201).json({
+          success : true,
+       message : "deleted successfully"
+      })
+     
+    }
+  }catch(err:any){
+    res.status(404).json({
+      success : false,
       message : err.message
     })
   }
-  
+})
+
+app.post("/todos", async (req:Request, res:Response)=> {
+  const [title] = req.body;
+  try{
+    const result = await pool.query(`INSERT INTO todos(title)`, [title])
+  }catch(err:any){
+
+  }
 })
 
 app.listen(port, () => {
