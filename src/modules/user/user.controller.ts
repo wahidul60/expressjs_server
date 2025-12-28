@@ -2,13 +2,13 @@ import { Request, Response } from "express";
 import { pool } from "../../config/db";
 import { userService } from "./user.service";
 
-const createUser = async (req: Request, res: Response) => {
-    const { name, email } = req.body
+const createUser = async (req: Request, res: Response) => {    
     try {
-        const result = await userService.createUser(name, email);
+        const result = await userService.createUser(req.body);
         res.status(201).json({
             success: true,
-            message: "user created"
+            message: "user created",
+            data : result.rows
         })
     } catch (err: any) {
         res.status(500).json({
