@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import { authServices } from "./auth.services";
 
 const loginUser = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     try {
-        const result = await authServices.loginUser(email, password)
+        const result = await authServices.loginUser(email, password, role)
        
         res.status(200).json({
             success: true,

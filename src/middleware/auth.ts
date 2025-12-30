@@ -9,15 +9,19 @@ const auth = (...role : string[] ) => {
             if (!token) {
                 return (res.status(200).json({ message: "unsuccessful login" }))
             }
-            const decode = jwt.verify(token, config.jwtSecret as string)
+            const decode = jwt.verify(token, config.jwtSecret as string) as JwtPayload
             console.log(decode)
-            req.user = decode as JwtPayload;
+            req.user = decode ;
+            if(role.length && !role.includes(decode.role as string)){
+                return (res.status(200).json({ message: "don't match" }))
+            }
             next();
         } catch (err: any) {
             res.status(404).json({
                 message : "error"
             })
         }
+        
     };
 
 }
